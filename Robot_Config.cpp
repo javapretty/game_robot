@@ -20,8 +20,8 @@ Robot_Config *Robot_Config::instance() {
 }
 
 void Robot_Config::load_robot_config(void) {
-	load_json_file("config/robot/robot_config.json", robot_config_.robot_config.get_cur_json());
-	load_json_file("config/robot/robot_msg.json", robot_config_.robot_msg.get_cur_json());
+	load_json_file("config/robot_config.json", robot_config_.robot_config.get_cur_json());
+	load_json_file("config/robot_msg.json", robot_config_.robot_msg.get_cur_json());
 }
 
 const Json::Value &Robot_Config::robot_config(void) {

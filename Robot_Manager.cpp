@@ -68,8 +68,8 @@ int Robot_Manager::init(void) {
 	robot_mode_ = robot_config["robot_mode"].asInt();
 	robot_index_ = 0;
 
-	load_struct("config/struct/game_db_struct.xml");
-	load_struct("config/struct/msg_struct.xml");
+	load_struct("config/game_struct.xml");
+	load_struct("config/msg_struct.xml");
 	return 0;
 }
 
