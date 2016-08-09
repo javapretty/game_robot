@@ -30,14 +30,6 @@ enum Message {
 	RES_CREATE_ROLE 			= 520002, 	//创建角色(返回)
 };
 
-struct Field_Info {
-	std::string field_label;
-	std::string field_type;
-	std::string field_name;
-	std::string key_type;
-	std::string key_name;
-};
-
 struct Args_Info {
 	int msg_id;
 	std::vector<int> args_list;
