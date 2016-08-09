@@ -18,9 +18,9 @@ public:
 	void print_msg(Block_Buffer &buffer);
 
 private:
-	void print_msg_arg(Field_Info &field_info, Block_Buffer &buffer);
-	void print_msg_vector(Field_Info &field_info, Block_Buffer &buffer);
-	void print_msg_struct(Field_Info &field_info, Block_Buffer &buffer);
+	void print_msg_arg(const Field_Info &field_info, Block_Buffer &buffer);
+	void print_msg_vector(const Field_Info &field_info, Block_Buffer &buffer);
+	void print_msg_struct(const Field_Info &field_info, Block_Buffer &buffer);
 };
 
 #endif /* MSG_STRUCT_H_ */
