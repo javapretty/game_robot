@@ -165,7 +165,7 @@
 	</Guild_Info>
 
 	<Rank_Info>
-		<head table_name="rank" index_name="rank_type" msg_id="150105"/>
+		<head table_name="rank" index_name="rank_type" msg_id="150104"/>
 		<arg type="int64" name="rank_type"/>
 		<arg type="int32" name="min_value"/>
 		<arg type="int64" name="min_role_id"/>
@@ -173,7 +173,7 @@
 	</Rank_Info>
 	
 	<Offline_Info>
-		<head table_name="offline" index_name="role_id" msg_id="150104"/>
+		<head table_name="offline" index_name="role_id" msg_id="150105"/>
 		<arg type="int64" name="role_id"/>
 		<arg type="int64" name="guild_id"/>
 		<arg type="string" name="guild_name"/>
