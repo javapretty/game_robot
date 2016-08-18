@@ -1,8 +1,8 @@
 {
    "login_ip" : "127.0.0.1",		//login ip
-   "login_port" : 7502,				//login port
+   "login_port" : 8200,				//login port
 	 "gate_ip" : "127.0.0.1",		//gate ip
-	 "gate_port" : 7507,   			//gate port
+	 "gate_port" : 8500,   			//gate port
    "robot_count" : 1,					//登录的机器人总数
    "login_interval" : 200,			//登录间隔,单位是毫秒
    "send_msg_interval" : 2000,	//发送消息间隔,单位是毫秒
