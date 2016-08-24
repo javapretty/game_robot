@@ -50,7 +50,7 @@ int Robot::tick(Time_Value &now) {
 
 int Robot::watcher_tick(int sec, int usec) {
 	Time_Value time_tick(sec, usec);
-	ROBOT_TIMER->watcher().add(this, Epoll_Watcher::EVENT_TIMEOUT, &time_tick);
+	ROBOT_TIMER->watcher().add(this, EVENT_TIMEOUT, &time_tick);
 	return 0;
 }
 

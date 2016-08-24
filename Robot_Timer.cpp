@@ -30,7 +30,7 @@ Robot_Timer *Robot_Timer::instance(void) {
 
 void Robot_Timer::register_handler(void) {
 	Time_Value timeout_tv(0, 10 * 1000);
-	watcher_.add(&timer_handler_, Epoll_Watcher::EVENT_TIMEOUT, &timeout_tv);
+	watcher_.add(&timer_handler_, EVENT_TIMEOUT, &timeout_tv);
 }
 
 void Robot_Timer::run_handler(void) {
