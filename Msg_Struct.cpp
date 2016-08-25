@@ -30,37 +30,44 @@ void Msg_Struct::print_msg(Block_Buffer &buffer) {
 
 void Msg_Struct::print_msg_arg(const Field_Info &field_info, Block_Buffer &buffer) {
 	if(field_info.field_type == "int8") {
-		int8_t value = buffer.read_int8();
+		int8_t value = 0;
+		buffer.read_int8(value);
 		LOG_INFO("struct_name:%s, field_type:%s, field_name:%s, field_value:%d",
 				struct_name().c_str(), field_info.field_type.c_str(), field_info.field_name.c_str(), value);
 	}
 	else if(field_info.field_type == "int16") {
-		int16_t value = buffer.read_int16();
+		int16_t value = 0;
+		buffer.read_int16(value);
 		LOG_INFO("struct_name:%s, field_type:%s, field_name:%s, field_value:%d",
 				struct_name().c_str(), field_info.field_type.c_str(), field_info.field_name.c_str(), value);
 	}
 	else if(field_info.field_type == "int32") {
-		int32_t value = buffer.read_int32();
+		int32_t value = 0;
+		buffer.read_int32(value);
 		LOG_INFO("struct_name:%s, field_type:%s, field_name:%s, field_value:%d",
 				struct_name().c_str(), field_info.field_type.c_str(), field_info.field_name.c_str(), value);
 	}
 	else if(field_info.field_type == "int64") {
-		int64_t value = buffer.read_int64();
+		int64_t value = 0;
+		buffer.read_int64(value);
 		LOG_INFO("struct_name:%s, field_type:%s, field_name:%s, field_value:%ld",
 				struct_name().c_str(), field_info.field_type.c_str(), field_info.field_name.c_str(), value);
 	}
 	else if(field_info.field_type == "double") {
-		double value = buffer.read_double();
+		double value = 0;
+		buffer.read_double(value);
 		LOG_INFO("struct_name:%s, field_type:%s, field_name:%s, field_value:%lf",
 				struct_name().c_str(), field_info.field_type.c_str(), field_info.field_name.c_str(), value);
 	}
 	else if(field_info.field_type == "bool") {
-		bool value = buffer.read_bool();
+		bool value = false;
+		buffer.read_bool(value);
 		LOG_INFO("struct_name:%s, field_type:%s, field_name:%s, field_value:%d",
 				struct_name().c_str(), field_info.field_type.c_str(), field_info.field_name.c_str(), value);
 	}
 	else if(field_info.field_type == "string") {
-		std::string value = buffer.read_string();
+		std::string value = "";
+		buffer.read_string(value);
 		LOG_INFO("struct_name:%s, field_type:%s, field_name:%s, field_value:%s",
 				struct_name().c_str(), field_info.field_type.c_str(), field_info.field_name.c_str(), value.c_str());
 	}
@@ -70,7 +77,8 @@ void Msg_Struct::print_msg_arg(const Field_Info &field_info, Block_Buffer &buffe
 }
 
 void Msg_Struct::print_msg_vector(const Field_Info &field_info, Block_Buffer &buffer) {
-	int32_t vec_size = buffer.read_uint16();
+	uint16_t vec_size = 0;
+	buffer.read_uint16(vec_size);
 	LOG_INFO("struct_name:%s, field_type:%s, field_name:%s, vec_size:%d",
 			struct_name().c_str(), field_info.field_type.c_str(), field_info.field_name.c_str(), vec_size);
 

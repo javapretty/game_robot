@@ -11,21 +11,22 @@
 #include "boost/unordered_map.hpp"
 #include <vector>
 #include "Time_Value.h"
+#include "Block_Buffer.h"
 
 typedef boost::unordered_map<int32_t, Time_Value> Msg_Cost_Time_Map;
 
 enum Message {
-	REQ_CLIENT_REGISTER 	= 100000, 	//注册
-	REQ_CLIENT_LOGIN 			= 100001, 	//登录login
-	REQ_CONNECT_GATE 			= 100002, 	//登录gate
-	REQ_HEARTBEAT 				= 100003, 	//心跳
-	RES_CLIENT_REGISTER 	= 500000, 	//注册(返回)
-	RES_CLIENT_LOGIN 			= 500001, 	//登录login(返回)
-	RES_CONNECT_GATE 			= 500002, 	//登录gate(返回)
-	RES_HEARTBEAT 				= 500003, 	//心跳(返回)
+	REQ_CONNECT_LOGIN 		= 100001, 	//客户端登录login
+	REQ_CONNECT_GATE 		= 100101, 	//客户端登录gate
+	REQ_SEND_HEARTBEAT	 	= 100102, 	//发送心跳到gate
+
+	RES_CONNECT_LOGIN 		= 500001, 	//客户端登录login(返回)
+	RES_CONNECT_GATE 		= 500101, 	//客户端登录gate(返回)
+	RES_SEND_HEARTBEAT 	= 500102, 	//发送心跳到gate(返回)
 
 	REQ_FETCH_ROLE_INFO 	= 120001, 	//获取角色信息
 	REQ_CREATE_ROLE 			=	120002, 	//创建角色
+
 	RES_FETCH_ROLE_INFO 	= 520001, 	//获取角色信息(返回)
 	RES_CREATE_ROLE 			= 520002, 	//创建角色(返回)
 };
@@ -61,6 +62,17 @@ struct Robot_Info {
 		exp = 0;
 		gender = 0;
 		career = 0;
+	}
+
+	int deserialize(Block_Buffer &buffer) {
+		buffer.read_int64(role_id);
+		buffer.read_string(role_name);
+		buffer.read_string(account);
+		buffer.read_int32(level);
+		buffer.read_int32(exp);
+		buffer.read_int8(gender);
+		buffer.read_int8(career);
+		return 0;
 	}
 };
 

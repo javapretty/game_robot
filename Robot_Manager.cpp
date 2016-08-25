@@ -95,13 +95,13 @@ int Robot_Manager::process_list(void) {
 		bool all_empty = true;
 		if ((buf = login_data_list_.pop_front()) != 0) {
 			all_empty = false;
-			cid = buf->peek_int32();
+			buf->peek_int32(cid);
 			process_block(*buf);
 			ROBOT_LOGIN_CONNECTOR->push_block(cid, buf);
 		}
 		if ((buf = gate_data_list_.pop_front()) != 0) {
 			all_empty = false;
-			cid = buf->peek_int32();
+			buf->peek_int32(cid);
 			process_block(*buf);
 			ROBOT_GATE_CONNECTOR->push_block(cid, buf);
 		}
@@ -119,13 +119,17 @@ int Robot_Manager::process_list(void) {
 }
 
 int Robot_Manager::process_block(Block_Buffer &buf) {
-	int32_t cid = buf.read_int32();
-	/*uint16_t len*/ buf.read_uint16();
-	uint32_t msg_id = buf.read_uint32();
-	int32_t status = buf.read_int32();
+	int32_t cid = 0;
+	int16_t len = 0;
+	int32_t msg_id = 0;
+	int32_t status = 0;
+	buf.read_int32(cid);
+	buf.read_int16(len);
+	buf.read_int32(msg_id);
+	buf.read_int32(status);
 
 	Robot *robot = nullptr;
-	if (msg_id == RES_CLIENT_REGISTER) {
+	if (msg_id == RES_CONNECT_LOGIN) {
 		robot = login_robot(cid);
 	} else {
 		robot = gate_robot(cid);
@@ -135,12 +139,8 @@ int Robot_Manager::process_block(Block_Buffer &buf) {
 	}
 
 	switch (msg_id) {
-	case RES_CLIENT_REGISTER:{
-		robot->client_register_res(status, buf);
-		break;
-	}
-	case RES_CLIENT_LOGIN:{
-		robot->client_login_res(status, buf);
+	case RES_CONNECT_LOGIN:{
+		robot->connect_login_res(status, buf);
 		break;
 	}
 	case RES_CONNECT_GATE: {
@@ -252,7 +252,7 @@ Robot *Robot_Manager::connect_login(char *account) {
 	else{
 		robot->robot_info().account = account;
 	}
-	robot->client_register();
+	robot->connect_login();
 	return robot;
 }
 

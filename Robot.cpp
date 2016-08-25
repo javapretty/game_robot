@@ -12,7 +12,6 @@
 #include "Robot_Manager.h"
 #include "Robot_Config.h"
 #include "Robot_Timer.h"
-#include "Robot_Msg.h"
 
 Robot::Robot(void):login_success_(false), login_cid_(0), gate_cid_(0), cost_time_total_(0), msg_count_(0) { }
 
@@ -156,61 +155,33 @@ int Robot::recv_server_msg(int status, int msg_id, Block_Buffer &buf) {
 	return 0;
 }
 
-int Robot::client_register() {
-	MSG_100000 msg;
-	msg.reset();
-	msg.account = robot_info_.account;
-	msg.password = robot_info_.account;
-
+int Robot::connect_login() {
 	Block_Buffer buf;
-	make_message(buf, REQ_CLIENT_REGISTER);
-	msg.serialize(buf);
-	buf.finish_message();
-	ROBOT_MANAGER->send_to_login(login_cid_, buf);
-
-	login_tick_ = Time_Value::gettimeofday();
-	return 0;
-}
-
-int Robot::client_login() {
-	MSG_100001 msg;
-	msg.reset();
-	msg.account = robot_info_.account;
-	msg.password = robot_info_.account;
-
-	Block_Buffer buf;
-	make_message(buf, REQ_CLIENT_LOGIN);
-	msg.serialize(buf);
+	make_message(buf, REQ_CONNECT_LOGIN);
+	buf.write_string(robot_info_.account);
+	buf.write_string(robot_info_.account);
 	buf.finish_message();
 	ROBOT_MANAGER->send_to_login(login_cid_, buf);
 	return 0;
 }
 
 int Robot::connect_gate(std::string& account, std::string& session) {
-	MSG_100002 msg;
-	msg.reset();
-	msg.account = account;
-	msg.session = session;
-
 	Block_Buffer buf;
 	make_message(buf, REQ_CONNECT_GATE);
-	msg.serialize(buf);
+	buf.write_string(account);
+	buf.write_string(session);
 	buf.finish_message();
 	ROBOT_MANAGER->send_to_gate(gate_cid_, buf);
 	return 0;
 }
 
 int Robot::send_heartbeat(Time_Value &now) {
-	MSG_100003 msg;
-	msg.reset();
-	msg.client_time = now.sec();
-
 	Block_Buffer buf;
-	make_message(buf, REQ_HEARTBEAT);
-	msg.serialize(buf);
+	make_message(buf, REQ_SEND_HEARTBEAT);
+	buf.write_int32(now.sec());
 	buf.finish_message();
 	ROBOT_MANAGER->send_to_gate(gate_cid_, buf);
-	set_msg_time(REQ_HEARTBEAT);
+	set_msg_time(REQ_SEND_HEARTBEAT);
 	return 0;
 }
 
@@ -235,29 +206,18 @@ int Robot::create_role(void) {
 	return 0;
 }
 
-int Robot::client_register_res(int status, Block_Buffer &buf) {
+int Robot::connect_login_res(int status, Block_Buffer &buf) {
 	int login_msec = Time_Value::gettimeofday().msec() - login_tick_.msec();
 	if (status == 0) {
-		MSG_500000 msg;
-		msg.deserialize(buf);
-		LOG_INFO("register success, gate_ip:%s, gate_port:%d, session:%s, account:%s, login_msec:%d",
-				msg.ip.c_str(), msg.port, msg.session.c_str(), robot_info_.account.c_str(), login_msec);
-		ROBOT_MANAGER->connect_gate(login_cid_, msg.ip, msg.port, msg.session, robot_info_.account) ;
-	} else {
-		LOG_ERROR("client register fail, account exist, status:%d, login_msec:%d", status, login_msec);
-	}
-
-	return 0;
-}
-
-int Robot::client_login_res(int status, Block_Buffer &buf) {
-	int login_msec = Time_Value::gettimeofday().msec() - login_tick_.msec();
-	if (status == 0) {
-		MSG_500001 msg;
-		msg.deserialize(buf);
+		std::string gate_ip;
+		int gate_port;
+		std::string session;
+		buf.read_string(gate_ip);
+		buf.read_int32(gate_port);
+		buf.read_string(session);
 		LOG_INFO("login success, gate_ip:%s, gate_port:%d, session:%s, account:%s, login_msec:%d",
-				msg.ip.c_str(), msg.port, msg.session.c_str(), robot_info_.account.c_str(), login_msec);
-		ROBOT_MANAGER->connect_gate(login_cid_, msg.ip, msg.port, msg.session, robot_info_.account) ;
+				gate_ip.c_str(), gate_port, session.c_str(), robot_info_.account.c_str(), login_msec);
+		ROBOT_MANAGER->connect_gate(login_cid_, gate_ip, gate_port, session, robot_info_.account) ;
 	} else {
 		LOG_ERROR("client login fail, account exist, status:%d, login_msec:%d", status, login_msec);
 	}
@@ -267,12 +227,12 @@ int Robot::client_login_res(int status, Block_Buffer &buf) {
 
 int Robot::connect_gate_res(int status, Block_Buffer &buf) {
 	if (status == 0) {
-		MSG_500002 msg;
-		msg.deserialize(buf);
+		std::string account;
+		buf.read_string(account);
 		int login_msec = Time_Value::gettimeofday().msec() - login_tick_.msec();
 		LOG_INFO("connect gate success, gate_cid = %d, account = %s, login_msec = %d", gate_cid_, robot_info_.account.c_str(), login_msec);
 
-		fetch_role_info(msg.account);
+		fetch_role_info(account);
 	} else {
 		LOG_ERROR("connect gate fail,repeat connect,please connect after 2s, status = %d", status);
 	}
@@ -282,13 +242,7 @@ int Robot::connect_gate_res(int status, Block_Buffer &buf) {
 int Robot::fetch_role_info_res(int status, Block_Buffer &buf) {
 	if (status == 0) {
 		Robot_Info robot_info;
-		robot_info.role_id = buf.read_int64();
-		robot_info.account = buf.read_string();
-		robot_info.role_name = buf.read_string();
-		robot_info.level = buf.read_int32();
-		robot_info.exp = buf.read_int32();
-		robot_info.gender = buf.read_int8();
-		robot_info.career = buf.read_int8();
+		robot_info.deserialize(buf);
 		login_game_success(robot_info);
 	} else {	/// 角色不存在, 创建角色
 		int login_msec = Time_Value::gettimeofday().msec() - login_tick_.msec();
@@ -304,7 +258,8 @@ int Robot::create_role_res(int status, Block_Buffer &buf) {
 	int login_msec = Time_Value::gettimeofday().msec() - login_tick_.msec();
 	if (status == 0) {
 		login_success_ = true;
-		int64_t role_id = buf.read_int64();
+		int64_t role_id = 0;
+		buf.read_int64(role_id);
 		LOG_INFO("create role success, account:%s, role_id:%ld, login_msec:%d", robot_info_.account.c_str(), role_id, login_msec);
 	} else {
 		LOG_ERROR("create role fail, status:%d, account:%s, login_msec:%d", status, robot_info_.account.c_str(), login_msec);
@@ -342,5 +297,5 @@ void Robot::make_message(Block_Buffer &buf, int msg_id) {
 
 	msg_info_.msg_serial++;
 
-	buf.make_client_message(serial_cipher, msg_time_cipher, msg_id, 0);
+	buf.make_client_message(msg_id, 0, serial_cipher, msg_time_cipher);
 }

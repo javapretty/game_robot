@@ -33,8 +33,7 @@ public:
 	int recv_server_msg(int status, int msg_id, Block_Buffer &buf);
 
 	//client->login
-	int client_register();
-	int client_login();
+	int connect_login();
 
 	//client->gate
 	int connect_gate(std::string& account, std::string& session);
@@ -45,8 +44,7 @@ public:
 	int create_role(void);
 
 	//login->client
-	int client_register_res(int status, Block_Buffer &buf);
-	int client_login_res(int status, Block_Buffer &buf);
+	int connect_login_res(int status, Block_Buffer &buf);
 
 	//gate->client
 	int connect_gate_res(int status, Block_Buffer &buf);
