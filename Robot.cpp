@@ -209,9 +209,9 @@ int Robot::create_role(void) {
 int Robot::connect_login_res(int status, Block_Buffer &buf) {
 	int login_msec = Time_Value::gettimeofday().msec() - login_tick_.msec();
 	if (status == 0) {
-		std::string gate_ip;
-		int gate_port;
-		std::string session;
+		std::string gate_ip = "";
+		int gate_port = 0;
+		std::string session = "";
 		buf.read_string(gate_ip);
 		buf.read_int32(gate_port);
 		buf.read_string(session);
